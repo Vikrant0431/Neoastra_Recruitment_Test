@@ -1,9 +1,15 @@
 #include<bits/stdc++.h>
 using namespace std;
 
+#define max(a, b) (return (a>b)?a:b)
 typedef vector<int> KEY;
 typedef int T;
 
+void rotateRight(Elem *& node);
+void rotateLeft(Elem *& node);
+void doubleRotateRight(Elem *& node);
+void doubleRotateLeft(Elem *& node);
+void balance(Elem*& cur, const KEY &key);
 
 struct Elem {
 	Elem():left(0), right(0), height(-1), rightThread(false) {}
@@ -18,6 +24,22 @@ Elem *_root; // a dummy root sentinel
 int _size;
 Elem *_lastLeft;
 
+int height(Elem *node) {
+    if (node == NULL)
+        return 0;
+    return node->height;
+}
+
+void updateHeight(Elem*& cur) {
+	cur->height = 1 + max(height(cur->left), height(cur->right));
+}
+
+int balanceFactor(Elem *cur) {
+	if (cur == NULL)
+        return 0;
+    return height(cur->left) - height(cur->right);
+}
+
 // helper method for creating a new node of tree
 struct Elem *createNew(const T &data) {
 	// Allocate memory for new node
@@ -25,6 +47,7 @@ struct Elem *createNew(const T &data) {
 	elem->data = data;
 	elem->left = NULL;
 	elem->right = NULL;
+	elem->height = 1;
 	elem->rightThread = false;
 	return elem;
 }
@@ -96,6 +119,38 @@ void printTree(ostream& out, int level, Elem *p) {
 	out<<endl;
 }
 
+void rotateRight(Elem *& node) {
+	struct Elem *x = node->left;
+    struct Elem *T2 = x->right;
+ 
+    // Perform rotation
+    x->right = node;
+    node->left = T2;
+ 
+    // Update heights
+    node->height = max(height(node->left), height(node->right))+1;
+    x->height = max(height(x->left), height(x->right))+1;
+ 
+    // Return new root
+    return x;
+}
+
+void rotateLeft(Elem *& node) {
+	struct Node *y = node->right;
+    struct Node *T2 = y->left;
+ 
+    // Perform rotation
+    y->left = node;
+    node->right = T2;
+ 
+    //  Update heights
+    node->height = max(height(node->left), height(node->right))+1;
+    y->height = max(height(y->left), height(y->right))+1;
+ 
+    // Return new root
+    return y;
+}
+
 // common code for deallocation
 void destructCode(Elem *& p) {
 	Elem *current = leftMostNode(_root);
@@ -112,14 +167,6 @@ void destructCode(Elem *& p) {
 	}
 }
 
-void rotateRight(Elem *& node);
-void rotateLeft(Elem *& node);
-void doubleRotateRight(Elem *& node);
-void doubleRotateLeft(Elem *& node);
-int balanceFactor(Elem *cur);
-void balance(Elem*& cur, const KEY &key);
-int height(Elem *node);
-void updateHeight(Elem*& cur);
 
 int main() {
 	
